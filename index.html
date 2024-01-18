@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identificación de Cultivos con Plantix</title>
+    <style>
+        /* Estilos CSS aquí */
+    </style>
+</head>
+<body>
+    <h1>Identificación de Cultivos con Plantix</h1>
+    
+    <form action="" method="post" enctype="multipart/form-data">
+        <label for="imagenInput">Subir imagen:</label>
+        <input type="file" name="imagenInput" accept="image/*" required>
+
+        <label for="cultivoSelect">Seleccionar cultivo:</label>
+        <select name="cultivoSelect" required>
+            <!-- Opciones de cultivo aquí -->
+            <option value="cultivo1">Coffee</option>
+            <option value="cultivo2">Pepper</option>
+            <option value="cultivo3">Corn</option>
+            <!-- Agrega más opciones según sea necesario -->
+        </select>
+
+        <button type="submit">Identificar Cultivo</button>
+    </form>
+
+    <div id="resultado">
+        <?php
+        // Manejar la identificación del cultivo después de enviar el formulario
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $imagen = $_FILES['imagenInput']['tmp_name'];
+            $cultivo = $_POST['cultivoSelect'];
+
+            // Configurar la llamada a la API de Plantix
+            $api_url = 'https://api.plantix.net/v2/image_analysis';
+            $datos = array(
+                'image' => new CURLFile($imagen),
+                'crop' => $cultivo
+            );
+
+            $ch = curl_init($api_url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $datos);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $respuesta = curl_exec($ch);
+            curl_close($ch);
+
+            $resultado = json_decode($respuesta, true);
+
+            // Mostrar el resultado en el div de resultados
+            echo '<p>Identificación: ' . $resultado['crop_name'] . '</p>' .
+                 '<p>Problema: ' . $resultado['disease'] . '</p>';
+        }
+        ?>
+    </div>
+</body>
+</html>
