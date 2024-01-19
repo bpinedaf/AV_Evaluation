@@ -30,38 +30,18 @@
 
     <script>
         function identificarCultivo() {
-            var fileInput = document.getElementById('imagenInput');
-            var cropSelect = document.getElementById('cultivoSelect').value;
-
-            var form = new FormData();
-            form.append("image", fileInput.files[0]);
-            form.append("crop", cropSelect);
-            form.append("application_used_image_gallery", "false");
-
-            var settings = {
-                "url": "https://api.plantix.net/v2/image_analysis",
-                "method": "POST",
-                "timeout": 0,
-                "headers": {
-                    "Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07",
-                },
-                "processData": false,
-                "mimeType": "multipart/form-data",
-                "contentType": false,
-                "data": form
-            };
-
-            $.ajax(settings)
-            .done(function (response) {
-                // Mostrar el resultado en el div de resultados
-                var resultadoDiv = document.getElementById('resultado');
-                resultadoDiv.innerHTML = '<p>Identificación: ' + response['crop_name'] + '</p>' +
-                                         '<p>Problema: ' + response['disease'] + '</p>';
+            const nombre_foto = document.querySelector("#nombre_foto").value;
+            const cultivo = document.querySelector("#cultivo").value;
+            
+            // Envía los datos del formulario a Google Colab
+            fetch("https://colab.research.google.com/github/bpinedaf/AV_Evaluation/blob/main/identificar_cultivo.py?nombre_foto=" + nombre_foto + "&cultivo=" + cultivo, {
+                method: "POST",
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                console.error('Error en la llamada a la API:', errorThrown);
-                // Manejar el error de manera adecuada, por ejemplo, mostrando un mensaje al usuario
-            });
+                .then(response => response.json())
+                .then(respuesta => {
+                    // Muestra el resultado de la API en la página web
+                    document.querySelector("#resultado").innerHTML = respuesta;
+                });
         }
     </script>
 </body>
