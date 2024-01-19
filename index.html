@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1><center></center>Identificación de Cultivos con Plantix</h1></center>
+    <h1>Identificación de Cultivos con Plantix</h1>
     
-    <form id="identificacionForm" action="api.php" method="post" enctype="multipart/form-data">
+    <form id="identificacionForm" enctype="multipart/form-data">
         <label for="imagenInput">Subir imagen:</label>
-        <input type="file" name="imagenInput" accept="image/*" required>
+        <input type="file" id="imagenInput" accept="image/*" required>
 
         <label for="cultivoSelect">Seleccionar cultivo:</label>
-        <select name="cultivoSelect" required>
+        <select id="cultivoSelect" required>
             <!-- Opciones de cultivo aquí -->
             <option value="cultivo1">Coffee</option>
             <option value="cultivo2">Pepper</option>
@@ -22,20 +22,28 @@
             <!-- Agrega más opciones según sea necesario -->
         </select>
 
-        <button type="submit">Identificar Cultivo</button>
+        <button type="button" onclick="identificarCultivo()">Identificar Cultivo</button>
     </form>
 
     <div id="resultado"></div>
-    <script defer>
-        document.getElementById('identificacionForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-        
-            var formData = new FormData(this);
-        
-            // Realizar la llamada al servidor (api.php)
-            fetch('API.php', {
+
+    <script>
+        function identificarCultivo() {
+            var formData = new FormData();
+            var imagenInput = document.getElementById('imagenInput');
+            var cultivoSelect = document.getElementById('cultivoSelect');
+            
+            // Agregar imagen y cultivo al FormData
+            formData.append('image', imagenInput.files[0]);
+            formData.append('crop', cultivoSelect.value);
+
+            // Configuración de la llamada a la API
+            fetch('https://api.plantix.net/v2/image_analysis', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'Authorization': 'Bearer TU_API_KEY', // Reemplazar con tu token real
+                },
             })
             .then(response => response.json())
             .then(resultado => {
@@ -45,13 +53,10 @@
                                          '<p>Problema: ' + resultado['disease'] + '</p>';
             })
             .catch(error => {
-                console.error('Error en la llamada al servidor:', error);
+                console.error('Error en la llamada a la API:', error);
                 // Manejar el error de manera adecuada, por ejemplo, mostrando un mensaje al usuario
             });
-        });
+        }
     </script>
-
-
-    
 </body>
 </html>
