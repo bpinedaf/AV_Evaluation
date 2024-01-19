@@ -30,8 +30,8 @@
 
     <script>
         function identificarCultivo() {
-            const nombre_foto = document.querySelector("#nombre_foto").value;
-            const cultivo = document.querySelector("#cultivo").value;
+            const nombre_foto = document.querySelector("#imagenInput").value;
+            const cultivo = document.querySelector("#cultivoSelect").value;
             
             // Envía los datos del formulario a Google Colab
             fetch("https://colab.research.google.com/github/bpinedaf/AV_Evaluation/blob/main/identificar_cultivo.py?nombre_foto=" + nombre_foto + "&cultivo=" + cultivo, {
