@@ -26,36 +26,35 @@
     </form>
 
     <div id="resultado">
-        ```
         <?php
         // Manejar la identificación del cultivo después de enviar el formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $imagen = $_FILES['imagenInput']['tmp_name'];
             $cultivo = $_POST['cultivoSelect'];
-
+        
             // Configurar la llamada a la API de Plantix
             $api_url = 'https://api.plantix.net/v2/image_analysis';
             $datos = array(
                 'image' => new CURLFile($imagen),
                 'crop' => $cultivo
             );
-
+        
             $ch = curl_init($api_url);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $datos);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
+        
             $respuesta = curl_exec($ch);
             curl_close($ch);
-
+        
             $resultado = json_decode($respuesta, true);
-
+        
             // Mostrar el resultado en el div de resultados
-            echo '<p>Identificación: ' . $resultado['crop_name'] . '</p>' .
-                 '<p>Problema: ' . $resultado['disease'] . '</p>';
+            echo '<p>Identificación: ' . $resultado['crop_name'] . '</p>';
+            echo '<p>Problema: ' . $resultado['disease'] . '</p>';
         }
         ?>
-        ```
+
     </div>
 </body>
 </html>
