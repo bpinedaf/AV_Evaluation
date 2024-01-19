@@ -1,17 +1,19 @@
 import requests
 
 def identify_crop(photo, crop):
-    # Llama a la API de identificación de cultivos de Plantix
-    url = "https://api.plantix.com/v2/image_analysis"
-    data = {
-        "image": photo,
-        "crop": crop,
-        "application_used_image_gallery":"false",
-    }
-    response = requests.post(url, json=data, headers={"Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07"})
+  # Llama a la API de identificación de cultivos de Plantix
+  url = "https://api.plantix.com/v2/image_analysis"
+  data = {
+    "image": photo,
+    "crop": crop,
+    "application_used_image_gallery":"false",
+  }
 
-    # Devuelve el resultado de la API
-    return response.json()
+  # Realiza la solicitud POST
+  response = requests.post(url, json=data, headers={"Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07"})
+
+  # Devuelve el resultado de la API
+  return response.json()
 
 # Obtiene los datos del formulario
 nombre_foto = request.args.get("nombre_foto")
@@ -22,3 +24,4 @@ respuesta = identify_crop(photo=nombre_foto, crop=cultivo)
 
 # Devuelve el resultado a la página web
 return respuesta
+
