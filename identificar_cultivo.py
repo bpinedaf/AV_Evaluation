@@ -6,6 +6,7 @@ def identify_crop(photo, crop):
     data = {
         "image": photo,
         "crop": crop,
+        "application_used_image_gallery":"false",
     }
     response = requests.post(url, json=data, headers={"Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07"})
 
