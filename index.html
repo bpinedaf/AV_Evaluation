@@ -26,6 +26,7 @@
     </form>
 
     <div id="resultado">
+        ```php
         <?php
         // Manejar la identificación del cultivo después de enviar el formulario
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,6 +55,7 @@
             echo '<p>Problema: ' . $resultado['disease'] . '</p>';
         }
         ?>
+        ```
 
     </div>
 </body>
