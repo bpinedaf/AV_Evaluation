@@ -10,7 +10,7 @@ def identify_crop(photo, crop):
   }
 
   # Realiza la solicitud POST
-  response = requests.post(url, json=data, headers={"Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07"})
+  response = requests.request("POST",url, data=data, headers={"Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07"})
 
   # Devuelve el resultado de la API
   return response.json()
