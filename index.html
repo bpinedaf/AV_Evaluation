@@ -36,7 +36,7 @@
             // Envía los datos del formulario a Google Colab
             fetch("https://colab.research.google.com/github/bpinedaf/AV_Evaluation/blob/main/identificar_cultivo.py?nombre_foto=" + nombre_foto + "&cultivo=" + cultivo, {
                 method: "POST",
-                mode: 'no-cors'
+               mode: "no-cors"
             })
                 .then(response => response.json())
                 .then(respuesta => {
