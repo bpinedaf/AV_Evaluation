@@ -30,20 +30,21 @@
 
     <script>
         function identificarCultivo() {
-            const nombre_foto = document.querySelector("#imagenInput").value;
-            const cultivo = document.querySelector("#cultivoSelect").value;
-            
-            // Envía los datos del formulario a Google Colab
-            fetch("https://colab.research.google.com/github/bpinedaf/AV_Evaluation/blob/main/identificar_cultivo.py?nombre_foto=" + nombre_foto + "&cultivo=" + cultivo, {
-                method: "POST",
-               mode: "no-cors"
-            })
-                .then(response => response.json())
-                .then(respuesta => {
-                    // Muestra el resultado de la API en la página web
-                    document.querySelector("#resultado").innerHTML = respuesta;
-                });
+          const nombre_foto = document.querySelector("#imagenInput").files[0].name;
+          const cultivo = document.querySelector("#cultivoSelect").value;
+        
+          // Envía los datos del formulario a Google Colab
+          fetch("https://colab.research.google.com/github/bpinedaf/AV_Evaluation/blob/main/identificar_cultivo.py?nombre_foto=" + nombre_foto + "&cultivo=" + cultivo, {
+            method: "POST",
+            mode: "no-cors"
+          })
+            .then(response => response.json())
+            .then(respuesta => {
+              // Muestra el resultado de la API en la página web
+              document.querySelector("#resultado").innerHTML = respuesta;
+            });
         }
+
     </script>
 </body>
 </html>
