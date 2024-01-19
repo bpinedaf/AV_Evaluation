@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Agregar el encabezado de autenticación Bearer
     $token = '2b0080cfd58f564046a1104db36c9163091c2a07'; // Reemplaza '123' con tu token real
     $encabezados = array(
+        'Accept: application/json'
         'Authorization: Bearer ' . $token,
     );
     curl_setopt($ch, CURLOPT_HTTPHEADER, $encabezados);
