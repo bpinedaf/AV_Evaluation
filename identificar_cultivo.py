@@ -2,7 +2,7 @@ import requests
 
 def identify_crop(photo, crop):
     # Llama a la API de identificación de cultivos de Plantix
-    url = "https://api.plantix.com/v2/crops"
+    url = "https://api.plantix.com/v2/image_analysis"
     data = {
         "image": photo,
         "crop": crop,
