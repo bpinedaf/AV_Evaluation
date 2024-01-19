@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Identificación de Cultivos con Plantix</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Identificación de Cultivos con Plantix</h1>
     
-    <form id="identificacionForm" enctype="multipart/form-data">
+    <form id="identificacionForm">
         <label for="imagenInput">Subir imagen:</label>
         <input type="file" id="imagenInput" accept="image/*" required>
 
         <label for="cultivoSelect">Seleccionar cultivo:</label>
         <select id="cultivoSelect" required>
             <!-- Opciones de cultivo aquí -->
-            <option value="cultivo1">Coffee</option>
-            <option value="cultivo2">Pepper</option>
-            <option value="cultivo3">Corn</option>
+            <option value="coffee">Coffee</option>
+            <option value="pepper">Pepper</option>
+            <option value="corn">Corn</option>
             <!-- Agrega más opciones según sea necesario -->
         </select>
 
@@ -29,33 +30,36 @@
 
     <script>
         function identificarCultivo() {
-            var formData = new FormData();
-            var imagenInput = document.getElementById('imagenInput');
-            var cultivoSelect = document.getElementById('cultivoSelect');
-            
-            // Agregar imagen y cultivo al FormData
-            formData.append('image', imagenInput.files[0]);
-            formData.append('crop', cultivoSelect.value);
+            var fileInput = document.getElementById('imagenInput');
+            var cropSelect = document.getElementById('cultivoSelect').value;
 
-            // Configuración de la llamada a la API
-            fetch('https://api.plantix.net/v2/image_analysis', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept: application/json',
-                    'Accept-Language:',
-                    'Authorization': 'Bearer 2b0080cfd58f564046a1104db36c9163091c2a07', 
+            var form = new FormData();
+            form.append("image", fileInput.files[0]);
+            form.append("crop", cropSelect);
+            form.append("application_used_image_gallery", "false");
+
+            var settings = {
+                "url": "https://api.plantix.net/v2/image_analysis",
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": "Bearer 2b0080cfd58f564046a1104db36c9163091c2a07",
                 },
-            })
-            .then(response => response.json())
-            .then(resultado => {
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": form
+            };
+
+            $.ajax(settings)
+            .done(function (response) {
                 // Mostrar el resultado en el div de resultados
                 var resultadoDiv = document.getElementById('resultado');
-                resultadoDiv.innerHTML = '<p>Identificación: ' + resultado['crop_name'] + '</p>' +
-                                         '<p>Problema: ' + resultado['disease'] + '</p>';
+                resultadoDiv.innerHTML = '<p>Identificación: ' + response['crop_name'] + '</p>' +
+                                         '<p>Problema: ' + response['disease'] + '</p>';
             })
-            .catch(error => {
-                console.error('Error en la llamada a la API:', error);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.error('Error en la llamada a la API:', errorThrown);
                 // Manejar el error de manera adecuada, por ejemplo, mostrando un mensaje al usuario
             });
         }
