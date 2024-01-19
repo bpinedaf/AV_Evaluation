@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Identificación de Cultivos con Plantix</h1>
+    <h1><center></center>Identificación de Cultivos con Plantix</h1></center>
     
-    <form action="" method="post" enctype="multipart/form-data">
+    <form id="identificacionForm" action="api.php" method="post" enctype="multipart/form-data">
         <label for="imagenInput">Subir imagen:</label>
         <input type="file" name="imagenInput" accept="image/*" required>
 
@@ -25,38 +25,33 @@
         <button type="submit">Identificar Cultivo</button>
     </form>
 
-    <div id="resultado">
-        ```php
-        <?php
-        // Manejar la identificación del cultivo después de enviar el formulario
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $imagen = $_FILES['imagenInput']['tmp_name'];
-            $cultivo = $_POST['cultivoSelect'];
+    <div id="resultado"></div>
+    <script defer>
+        document.getElementById('identificacionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
         
-            // Configurar la llamada a la API de Plantix
-            $api_url = 'https://api.plantix.net/v2/image_analysis';
-            $datos = array(
-                'image' => new CURLFile($imagen),
-                'crop' => $cultivo
-            );
+            var formData = new FormData(this);
         
-            $ch = curl_init($api_url);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $datos);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        
-            $respuesta = curl_exec($ch);
-            curl_close($ch);
-        
-            $resultado = json_decode($respuesta, true);
-        
-            // Mostrar el resultado en el div de resultados
-            echo '<p>Identificación: ' . $resultado['crop_name'] . '</p>';
-            echo '<p>Problema: ' . $resultado['disease'] . '</p>';
-        }
-        ?>
-        ```
+            // Realizar la llamada al servidor (api.php)
+            fetch('API.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(resultado => {
+                // Mostrar el resultado en el div de resultados
+                var resultadoDiv = document.getElementById('resultado');
+                resultadoDiv.innerHTML = '<p>Identificación: ' + resultado['crop_name'] + '</p>' +
+                                         '<p>Problema: ' + resultado['disease'] + '</p>';
+            })
+            .catch(error => {
+                console.error('Error en la llamada al servidor:', error);
+                // Manejar el error de manera adecuada, por ejemplo, mostrando un mensaje al usuario
+            });
+        });
+    </script>
 
-    </div>
+
+    
 </body>
 </html>
