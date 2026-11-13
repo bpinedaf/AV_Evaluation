@@ -1,34 +1,63 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $imagen = $_FILES['imagenInput']['tmp_name'];
-    $cultivo = $_POST['cultivoSelect'];
+declare(strict_types=1);
 
-    $api_url = 'https://api.plantix.net/v2/image_analysis';
-    $datos = array(
-        'image' => new CURLFile($imagen),
-        'crop' => $cultivo
-    );
+header('Content-Type: application/json; charset=utf-8');
 
-    $ch = curl_init($api_url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $datos);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    // Agregar el encabezado de autenticación Bearer
-    $token = '2b0080cfd58f564046a1104db36c9163091c2a07'; // Reemplaza '123' con tu token real
-    $encabezados = array(
-        'Accept: application/json'
-        'Authorization: Bearer ' . $token,
-    );
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $encabezados);
-
-    $respuesta = curl_exec($ch);
-    curl_close($ch);
-
-    $resultado = json_decode($respuesta, true);
-
-    // Devolver la respuesta como JSON
-    header('Content-Type: application/json');
-    echo json_encode($resultado);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed. Use POST.']);
+    exit;
 }
-?>
+
+$token = getenv('PLANTIX_API_TOKEN');
+$apiUrl = getenv('PLANTIX_API_URL') ?: 'https://api.plantix.net/v2/image_analysis';
+
+if (!$token) {
+    http_response_code(500);
+    echo json_encode(['error' => 'PLANTIX_API_TOKEN is not configured on the server.']);
+    exit;
+}
+
+if (
+    !isset($_FILES['imagenInput']) ||
+    $_FILES['imagenInput']['error'] !== UPLOAD_ERR_OK ||
+    !isset($_POST['cultivoSelect'])
+) {
+    http_response_code(400);
+    echo json_encode(['error' => 'An image and crop selection are required.']);
+    exit;
+}
+
+$imagePath = $_FILES['imagenInput']['tmp_name'];
+$crop = trim((string) $_POST['cultivoSelect']);
+
+$payload = [
+    'image' => new CURLFile($imagePath),
+    'crop' => $crop,
+];
+
+$ch = curl_init($apiUrl);
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => $payload,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTPHEADER => [
+        'Accept: application/json',
+        'Authorization: Bearer ' . $token,
+    ],
+]);
+
+$response = curl_exec($ch);
+$status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$error = curl_error($ch);
+curl_close($ch);
+
+if ($response === false) {
+    http_response_code(502);
+    echo json_encode(['error' => 'Upstream API request failed.', 'detail' => $error]);
+    exit;
+}
+
+http_response_code($status >= 200 && $status < 600 ? $status : 502);
+echo $response;
