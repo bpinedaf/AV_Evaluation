@@ -1,50 +1,80 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identificación de Cultivos con Plantix</title>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <title>Agricultural Image Analysis Prototype</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Identificación de Cultivos con Plantix</h1>
-    
-    <form id="identificacionForm">
-        <label for="imagenInput">Subir imagen:</label>
-        <input type="file" id="imagenInput" accept="image/*" required>
+    <main class="container">
+        <section class="card">
+            <p class="eyebrow">AI / API Integration Prototype</p>
+            <h1>Agricultural Image Analysis</h1>
+            <p class="intro">
+                Upload a crop image and submit it to the configured Plantix image-analysis API.
+                This repository is a technical prototype for API integration and agricultural image workflows.
+            </p>
 
-        <label for="cultivoSelect">Seleccionar cultivo:</label>
-        <select id="cultivoSelect" required>
-            <!-- Opciones de cultivo aquí -->
-            <option value="coffee">Coffee</option>
-            <option value="pepper">Pepper</option>
-            <option value="corn">Corn</option>
-            <!-- Agrega más opciones según sea necesario -->
-        </select>
+            <form id="identificationForm">
+                <label for="imagenInput">Image</label>
+                <input type="file" id="imagenInput" name="imagenInput" accept="image/*" required>
 
-        <button type="button" onclick="identificarCultivo()">Identificar Cultivo</button>
-    </form>
+                <label for="cultivoSelect">Crop</label>
+                <select id="cultivoSelect" name="cultivoSelect" required>
+                    <option value="coffee">Coffee</option>
+                    <option value="pepper">Pepper</option>
+                    <option value="corn">Corn</option>
+                </select>
 
-    <div id="resultado"></div>
+                <button type="submit">Analyze image</button>
+            </form>
+
+            <section class="result-section" aria-live="polite">
+                <h2>API response</h2>
+                <pre id="resultado">No analysis submitted yet.</pre>
+            </section>
+        </section>
+    </main>
 
     <script>
-        function identificarCultivo() {
-          const nombre_foto = document.querySelector("#imagenInput").files[0].name;
-          const cultivo = document.querySelector("#cultivoSelect").value;
-        
-          // Envía los datos del formulario a Google Colab
-          fetch("https://colab.research.google.com/github/bpinedaf/AV_Evaluation/blob/main/identificar_cultivo.py?nombre_foto=" + nombre_foto + "&cultivo=" + cultivo, {
-            method: "POST",
-            mode: "no-cors"
-          })
-            .then(response => response.json())
-            .then(respuesta => {
-              // Muestra el resultado de la API en la página web
-              document.querySelector("#resultado").innerHTML = respuesta;
-            });
-        }
+        const form = document.querySelector("#identificationForm");
+        const result = document.querySelector("#resultado");
 
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const image = document.querySelector("#imagenInput").files[0];
+            const crop = document.querySelector("#cultivoSelect").value;
+
+            if (!image) {
+                result.textContent = "Please select an image.";
+                return;
+            }
+
+            const payload = new FormData();
+            payload.append("imagenInput", image);
+            payload.append("cultivoSelect", crop);
+
+            result.textContent = "Analyzing...";
+
+            try {
+                const response = await fetch("API.php", {
+                    method: "POST",
+                    body: payload
+                });
+
+                const body = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(body.error || "The analysis request failed.");
+                }
+
+                result.textContent = JSON.stringify(body, null, 2);
+            } catch (error) {
+                result.textContent = `Error: ${error.message}`;
+            }
+        });
     </script>
 </body>
 </html>
